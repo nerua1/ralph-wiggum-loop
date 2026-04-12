@@ -207,7 +207,64 @@ ralph-loop.sh -f input.py -vvv
 - Zwiększ max iteracji: `-i 5`
 - Dodaj szczegółowy kontekst: `-p "Szczegółowe wymagania"`
 
+## Tryb Persistence (Ralph Classic)
+
+Drugi wzorzec — zamiast poprawiać jakość, **nie przestawaj dopóki zadanie nie jest skończone**.
+
+```
+/ralph "zaimplementuj JWT auth"
+→ pętla do 10 iteracji
+→ każda iteracja: praca → weryfikacja → decyzja
+→ wyjście tylko gdy: testy przechodzą + build działa + 0 TODO
+```
+
+### Kroki pętli persistence
+
+```
+1. SNAPSHOT stanu zadania
+2. REVIEW — co zostało zrobione
+3. KONTYNUACJA od miejsca przerwania
+4. DELEGACJA do subagentów
+5. DŁUGIE OPERACJE w tle (build, testy)
+6. WERYFIKACJA — dowody wymagane
+7. ARCHITECT REVIEW
+8. DESLOP — czyszczenie AI slop
+9. REGRESSION CHECK
+10. DECYZJA: done → exit / nie done → kolejna iteracja
+```
+
+### Kryteria zakończenia (wszystkie muszą być true)
+
+- [ ] Wszystkie wymagania spełnione
+- [ ] Zero TODO/FIXME
+- [ ] Testy przechodzą (świeże uruchomienie)
+- [ ] Build succeeds
+- [ ] Żadnych nowych błędów
+- [ ] Architect review OK
+- [ ] Regression tests OK
+
+### Kiedy używać którego trybu
+
+| Sytuacja | Tryb |
+|----------|------|
+| Popraw jakość kodu / outputu | **Generator→Critic→Fixer→Verifier** |
+| Skończ zadanie, nie odpuszczaj | **Persistence (`/ralph`)** |
+| Złożone zadanie wieloetapowe | Oba razem: ralph wrapper + wiggum loop wewnątrz |
+
+### State management (persistence mode)
+
+```
+~/.openclaw/state/ralph/
+├── current-task.json
+├── iteration-N/
+│   ├── attempt.log
+│   ├── result.json
+│   └── evidence/
+└── verification.json
+```
+
 ## Autor
 
 Stworzone jako narzędzie OpenClaw.
 Nazwa inspirowana Ralphem Wiggumem - "I'm helping!"
+ralph persistence mode: adapted from oh-my-codex (Rook).
